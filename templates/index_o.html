@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>串口控制</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        function toggleSerial(state) {
+            socket.emit('toggle_serial', state);  // 发送打开/关闭串口命令
+        }
+
+        function sendCommand() {
+            const command = document.getElementById('sendCommand').value;  // 获取发送框的内容
+            socket.emit('send_command', command);  // 发送命令到后端
+        }
+
+        socket.on('connect', () => {
+            console.log('Socket connected');
+        });
+
+        socket.on('serial_data', function(data) {
+            console.log('Received data:', data);  // 打印接收到的数据
+            const display = document.getElementById('display');
+            display.value += data.data + '\n';  // 在显示框中显示接收到的数据
+            display.scrollTop = display.scrollHeight;  // 滚动到最新内容
+        });
+    </script>
+</head>
+<body>
+<h1>串口控制</h1>
+<textarea id="display" rows="10" cols="30" readonly></textarea><br>
+<button onclick="toggleSerial('open')">打开串口</button>
+<button onclick="toggleSerial('close')">关闭串口</button>
+<br>
+<input type="text" id="sendCommand" placeholder="输入发送内容">
+<button onclick="sendCommand()">发送</button>
+</body>
+</html>
